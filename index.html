@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aantik — Monitor Sectorial</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#2d5b86;--teal:#51c0ac;--cel:#9dcfe4;--bg:#f4f7fa}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100vh;padding:20px}
+.shell{max-width:900px;margin:0 auto;background:var(--bg);border-radius:14px;overflow:hidden;border:0.5px solid #dde3ea;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.topbar{background:var(--navy);padding:12px 22px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px}
+.logo img{width:42px;height:42px;object-fit:contain}
+.logotext{color:#fff;font-size:18px;font-weight:500}
+.logosub{color:var(--cel);font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.mo{background:rgba(81,192,172,.18);border:0.5px solid rgba(81,192,172,.35);color:var(--cel);font-size:12px;border-radius:6px;padding:4px 12px}
+.sel-bar{background:#fff;border-bottom:0.5px solid #dde3ea;padding:12px 22px;display:flex;align-items:center;gap:12px}
+.sel-lbl{font-size:12px;color:#6b7a8d;font-weight:500;white-space:nowrap}
+select{padding:7px 12px;border-radius:8px;border:1.5px solid #dde3ea;font-size:14px;color:#1a2a3a;background:#fff;cursor:pointer;outline:none;flex:1;max-width:320px}
+select:focus{border-color:var(--teal)}
+.genbtn{padding:8px 18px;border-radius:8px;border:none;background:var(--teal);color:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.genbtn:hover{background:#3da896}
+.genbtn:disabled{background:#b0d8d1;cursor:not-allowed}
+.content{padding:18px 22px;display:flex;flex-direction:column;gap:14px}
+.empty-msg{text-align:center;padding:40px;color:#a0aab4;font-size:14px}
+.client-card{background:#fff;border-radius:10px;border:0.5px solid #dde3ea;padding:14px 18px}
+.cname{font-size:19px;font-weight:500;color:var(--navy)}
+.cgiro{font-size:13px;color:#6b7a8d;margin-top:3px}
+.tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 9px;border-radius:5px;font-weight:500}
+.tag-s{background:#e3edf6;color:var(--navy)}
+.tag-c{background:#e3f5f1;color:#0d6e5f}
+.cols{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+@media(max-width:600px){.cols{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:10px;border:0.5px solid #dde3ea;overflow:hidden}
+.phead{padding:9px 16px;border-bottom:0.5px solid #dde3ea;font-size:11px;font-weight:500;color:#8a97a5;text-transform:uppercase;letter-spacing:.06em}
+.pb{padding:14px 16px}
+.sem-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.sem{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500}
+.sdots{display:flex;gap:3px;align-items:center}
+.sd{width:14px;height:5px;border-radius:3px}
+.tit{font-size:14px;font-weight:500;color:#1a2a3a;margin-bottom:10px;line-height:1.4}
+.inds{background:var(--bg);border-radius:8px;padding:8px 12px;margin-bottom:10px}
+.irow{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:0.5px solid #eef0f2}
+.irow:last-child{border-bottom:none}
+.ilbl{color:#6b7a8d}
+.ival{display:flex;align-items:center;gap:4px;font-weight:500;color:#1a2a3a}
+.narr{font-size:13px;color:#4a5568;line-height:1.65;margin-bottom:10px}
+.impl{border-left:3px solid var(--teal);padding-left:10px;border-radius:0}
+.impl-lbl{font-size:10px;font-weight:500;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.impl-txt{font-size:12px;color:#4a5568;line-height:1.6}
+.giro-sep{margin-top:12px;padding-top:12px;border-top:0.5px solid #eef0f2}
+.giro-tag{display:inline-flex;align-items:center;gap:5px;background:#e3f5f1;color:#0d6e5f;font-size:11px;font-weight:500;padding:3px 9px;border-radius:5px;margin-bottom:8px}
+.hrow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.hm{font-size:11px;color:#8a97a5;width:36px}
+.hbw{flex:1;background:#eef0f2;border-radius:3px;height:11px;overflow:hidden}
+.hb{height:100%;border-radius:3px}
+.hs{font-size:11px;color:#4a5568;width:28px;text-align:right}
+.hnote{font-size:11px;color:#a0aab4;margin-top:10px;padding-top:8px;border-top:0.5px solid #eef0f2;line-height:1.5}
+.load{display:flex;align-items:center;gap:8px;font-size:13px;color:#8a97a5;padding:20px 0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+.err{font-size:12px;color:#c0392b;background:#fdf0ee;border-radius:7px;padding:10px 12px}
+.regen{font-size:11px;color:#8a97a5;cursor:pointer;border:0.5px solid #dde3ea;border-radius:5px;padding:3px 9px;background:transparent;margin-top:10px;float:right}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo">
+      <img src="data:image/png;base64,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" alt="Aantik">
+      <div>
+        <div class="logotext">Aantik</div>
+        <div class="logosub">Monitor sectorial</div>
+      </div>
+    </div>
+    <span class="mo">Abril 2026</span>
+  </div>
+  <div class="sel-bar">
+    <span class="sel-lbl">Cliente:</span>
+    <select id="sel" onchange="onSelect(this.value)">
+      <option value="">— Selecciona un cliente —</option>
+      <optgroup label="Manufactura embalaje (321)">
+        <option value="eco">Eco Embala</option>
+        <option value="bc">BC Packaging</option>
+      </optgroup>
+      <optgroup label="Comercio de alimentos (461)">
+        <option value="carnovo">Carnovo</option>
+      </optgroup>
+      <optgroup label="Turismo y hospitalidad (531–721)">
+        <option value="mia">MIA</option>
+        <option value="andiani">Andiani</option>
+        <option value="moondi">Moondi</option>
+      </optgroup>
+      <optgroup label="Restaurantes (722)">
+        <option value="wetiko">Wetiko (Fism)</option>
+        <option value="bendito">Bendito Mar (Fism)</option>
+        <option value="barra">Barra Santa María (Fism)</option>
+      </optgroup>
+      <optgroup label="Logística (481–488)">
+        <option value="cofran">COFRAN</option>
+      </optgroup>
+      <optgroup label="Comercio al por mayor (431)">
+        <option value="colmexco">Colmexco</option>
+      </optgroup>
+    </select>
+    <button class="genbtn" id="genbtn" disabled onclick="runAnalysis()">Generar análisis</button>
+  </div>
+  <div class="content" id="content">
+    <div class="empty-msg">Selecciona un cliente en el menú de arriba para comenzar</div>
+  </div>
+</div>
+
+<script>
+const CLIENTS={eco:{name:"Eco Embala",giro:"Manufactura de embalaje de madera",sector:"Manufactura embalaje madera",scian:"321",ac:"#2d5b86",gl:"Embalaje industrial — pallets y cajas",ctx:"Manufactura embalaje de madera México: pallets, cajas pino/encino. SCIAN 321. EMIM rama 321 INEGI, precios madera aserrada SNIIM, producción forestal SINAFOR, PMI manufacturero IMEF, tipo de cambio USD/MXN. Capa giro: disponibilidad y precio madera, demanda sector industrial. Abril 2026."},bc:{name:"BC Packaging",giro:"Manufactura de embalaje de madera",sector:"Manufactura embalaje madera",scian:"321",ac:"#2d5b86",gl:"Embalaje industrial — pallets y cajas",ctx:"Manufactura embalaje de madera México. SCIAN 321. PMI manufacturero, EMIM 321, precios madera SNIIM, tipo de cambio. Competitividad costos madera. Abril 2026."},carnovo:{name:"Carnovo",giro:"Dealer de cortes de carne, pollo y pescado",sector:"Comercio de alimentos",scian:"461",ac:"#BA7517",gl:"Cortes de carne, pollo y pescado",ctx:"Comercio alimentos: carnicería cortes res/pollo/pescado. SCIAN 461. Precios proteína SNIIM, INPC alimentos, consumo privado IGAE, ENCO. Volatilidad precios res/pollo/pescado mayoristas. Abril 2026."},mia:{name:"MIA",giro:"Hotel y restaurante — Riviera Maya",sector:"Turismo y hospitalidad",scian:"721–722",ac:"#0F6E56",gl:"Hotel + restaurante en destino vacacional",ctx:"Hotel y restaurante Riviera Maya. SCIAN 721-722. Llegadas turistas SECTUR/Datatur, ocupación hotelera Quintana Roo, tipo de cambio USD/MXN, consumer confidence EE.UU. Semana Santa abril 2026."},andiani:{name:"Andiani",giro:"Arrendamiento vacacional — Riviera Maya",sector:"Turismo y hospitalidad",scian:"531",ac:"#0F6E56",gl:"Renta vacacional de corto plazo",ctx:"Arrendamiento propiedades vacacionales Riviera Maya. SCIAN 531. Turismo extranjero, precios renta vacacional, tipo de cambio. Semana Santa abril 2026."},moondi:{name:"Moondi",giro:"Agencia de viajes",sector:"Turismo y hospitalidad",scian:"561",ac:"#0F6E56",gl:"Venta de paquetes y servicios de viaje",ctx:"Agencia de viajes México. SCIAN 561. Reservaciones aéreas, llegadas turistas SECTUR, consumer confidence EE.UU., tipo de cambio. Volumen paquetes turísticos. Abril 2026."},wetiko:{name:"Wetiko (Fism)",giro:"Restaurante especializado en mariscos",sector:"Restaurantes",scian:"722",ac:"#993C1D",gl:"Mariscos frescos — camarón, pulpo, pescado",ctx:"Restaurante mariscos Fism/Wetiko. SCIAN 722. Precios mariscos SNIIM, INPC alimentos fuera del hogar, IGAE servicios, Semana Santa. Disponibilidad precio camarón, pulpo, pescado frescos. Abril 2026."},bendito:{name:"Bendito Mar (Fism)",giro:"Restaurante — Fism",sector:"Restaurantes",scian:"722",ac:"#993C1D",gl:"Restaurante en destino turístico",ctx:"Restaurante Bendito Mar Fism. SCIAN 722. Indicadores restaurantes + temporada turística. Demanda estacional Semana Santa. Abril 2026."},barra:{name:"Barra Santa María (Fism)",giro:"Restaurante — Fism",sector:"Restaurantes",scian:"722",ac:"#993C1D",gl:"Restaurante en destino turístico",ctx:"Restaurante Barra Santa María Fism. SCIAN 722. Demanda estacional y flujo comensales. Abril 2026."},cofran:{name:"COFRAN",giro:"Logística y transporte multimodal",sector:"Transporte y logística",scian:"481–488",ac:"#534AB7",gl:"Carga multimodal — marítimo, terrestre, aéreo",ctx:"Logística transporte multimodal México. SCIAN 481-488. Comercio exterior SAT/Banxico, actividad portuaria SCT, Baltic Dry Index, tipo de cambio, aranceles T-MEC EE.UU.-México 2026."},colmexco:{name:"Colmexco",giro:"Comercializadora de café",sector:"Comercio al por mayor",scian:"431",ac:"#3B6D11",gl:"Comercialización y exportación de café",ctx:"Comercializadora café México. SCIAN 431. Precio arábica ICE Futures NY, robusta LIFFE Londres, tipo de cambio USD/MXN, exportaciones agropecuarias Banxico, producción SIAP, clima zonas cafetaleras. Abril 2026."}};
+const HIST={eco:[{m:"Nov",s:3},{m:"Dic",s:3},{m:"Ene",s:4},{m:"Feb",s:3},{m:"Mar",s:3}],bc:[{m:"Nov",s:3},{m:"Dic",s:3},{m:"Ene",s:4},{m:"Feb",s:3},{m:"Mar",s:3}],carnovo:[{m:"Nov",s:2},{m:"Dic",s:3},{m:"Ene",s:2},{m:"Feb",s:2},{m:"Mar",s:3}],mia:[{m:"Nov",s:4},{m:"Dic",s:5},{m:"Ene",s:3},{m:"Feb",s:4},{m:"Mar",s:4}],andiani:[{m:"Nov",s:4},{m:"Dic",s:5},{m:"Ene",s:3},{m:"Feb",s:4},{m:"Mar",s:4}],moondi:[{m:"Nov",s:3},{m:"Dic",s:4},{m:"Ene",s:3},{m:"Feb",s:3},{m:"Mar",s:4}],wetiko:[{m:"Nov",s:3},{m:"Dic",s:4},{m:"Ene",s:3},{m:"Feb",s:3},{m:"Mar",s:3}],bendito:[{m:"Nov",s:3},{m:"Dic",s:4},{m:"Ene",s:3},{m:"Feb",s:3},{m:"Mar",s:3}],barra:[{m:"Nov",s:3},{m:"Dic",s:4},{m:"Ene",s:3},{m:"Feb",s:3},{m:"Mar",s:3}],cofran:[{m:"Nov",s:2},{m:"Dic",s:2},{m:"Ene",s:2},{m:"Feb",s:3},{m:"Mar",s:2}],colmexco:[{m:"Nov",s:4},{m:"Dic",s:3},{m:"Ene",s:4},{m:"Feb",s:5},{m:"Mar",s:4}]};
+const results={};let current=null;
+function onSelect(id){current=id;document.getElementById('genbtn').disabled=!id;if(!id){document.getElementById('content').innerHTML='<div class="empty-msg">Selecciona un cliente en el menú de arriba para comenzar</div>';return;}render(id);}
+function ico(t){return t==='positivo'?'<span style="font-size:10px;color:#16a34a;font-weight:700">▲</span>':t==='negativo'?'<span style="font-size:10px;color:#dc2626;font-weight:700">▼</span>':'<span style="font-size:10px;color:#ca8a04;font-weight:700">●</span>';}
+function render(id){
+  const cl=CLIENTS[id],res=results[id],hist=HIST[id]||[];
+  const histHTML=hist.map(h=>{const pct=Math.round(h.s/5*100),bc=h.s>=4?'#51c0ac':h.s===3?'#f0a500':'#e05050';return`<div class="hrow"><span class="hm">${h.m}</span><div class="hbw"><div class="hb" style="width:${pct}%;background:${bc}"></div></div><span class="hs">${h.s}/5</span></div>`;}).join('');
+  let aHTML='';
+  if(!res){aHTML='<div class="empty-msg" style="padding:24px 0">Haz clic en <strong>Generar análisis</strong> para ver el análisis de abril 2026</div>';}
+  else if(res==='loading'){aHTML='<div class="load"><span class="spin">⟳</span> Buscando información y generando análisis...</div>';}
+  else if(res.error){aHTML=`<div class="err">${res.error} <button style="margin-left:8px;font-size:11px;cursor:pointer;border:0.5px solid #dde3ea;border-radius:5px;padding:3px 8px;background:#fff" onclick="runAnalysis()">Reintentar</button></div>`;}
+  else{
+    const sem=res.semaforo==='verde'?{bg:'#edfaf6',c:'#0d6e5f',dot:'#22c55e',lbl:'Favorable'}:res.semaforo==='rojo'?{bg:'#fef2f2',c:'#991b1b',dot:'#ef4444',lbl:'Adverso'}:{bg:'#fffbeb',c:'#854d0e',dot:'#eab308',lbl:'Neutral / Mixto'};
+    const pips=[1,2,3,4,5].map(i=>`<div class="sd" style="background:${i<=res.score?cl.ac:'#dde3ea'}"></div>`).join('');
+    const inds=(res.indicadores||[]).map(x=>`<div class="irow"><span class="ilbl">${x.nombre}</span><span class="ival">${x.valor} ${ico(x.icono)}</span></div>`).join('');
+    const ginds=(res.giro_indicadores||[]).map(x=>`<div class="irow"><span class="ilbl">${x.nombre}</span><span class="ival">${x.valor} ${ico(x.icono)}</span></div>`).join('');
+    aHTML=`<div class="sem-row"><span class="sem" style="background:${sem.bg};color:${sem.c}"><span style="width:8px;height:8px;border-radius:50%;background:${sem.dot};display:inline-block"></span>${sem.lbl}</span><div class="sdots">${pips}<span style="font-size:11px;color:#8a97a5;margin-left:4px">${res.score}/5</span></div></div><p class="tit">${res.titular||''}</p><div class="inds">${inds}</div><p class="narr">${res.narrativa||''}</p><div class="impl"><p class="impl-lbl">Implicación para ${cl.name}</p><p class="impl-txt">${res.implicacion||''}</p></div>${ginds?`<div class="giro-sep"><div class="giro-tag"><span style="width:6px;height:6px;border-radius:50%;background:#51c0ac;display:inline-block"></span>${cl.gl}</div><div class="inds">${ginds}</div><div class="impl" style="border-left-color:${cl.ac}"><p class="impl-lbl">Contexto del giro</p><p class="impl-txt">${res.giro_narrativa||''}</p></div></div>`:''}<button class="regen" onclick="runAnalysis()">Regenerar ↻</button><div style="clear:both"></div>`;
+  }
+  document.getElementById('content').innerHTML=`<div class="client-card"><p class="cname">${cl.name}</p><p class="cgiro">${cl.giro}</p><div class="tags"><span class="tag tag-s">${cl.sector}</span><span class="tag tag-c">SCIAN ${cl.scian}</span></div></div><div class="cols"><div class="panel"><div class="phead">Análisis sectorial — Abril 2026</div><div class="pb">${aHTML}</div></div><div class="panel"><div class="phead">Histórico de score</div><div class="pb">${histHTML}<p class="hnote">Datos de ejemplo nov–mar. Abril se agrega al completar el análisis.</p></div></div></div>`;
+}
+async function runAnalysis(){
+  if(!current)return;
+  const cl=CLIENTS[current],btn=document.getElementById('genbtn');
+  btn.disabled=true;btn.textContent='Analizando...';
+  results[current]='loading';render(current);
+  const prompt=`Eres analista económico especializado en México. Analiza sentimiento del sector y giro de ${cl.name} para abril 2026.\n\nContexto: ${cl.ctx}\n\nResponde SOLO JSON sin texto ni backticks:\n{"semaforo":"verde|amarillo|rojo","score":1-5,"titular":"frase max 10 palabras","indicadores":[{"nombre":"...","valor":"...","icono":"positivo|neutro|negativo"},{"nombre":"...","valor":"...","icono":"positivo|neutro|negativo"},{"nombre":"...","valor":"...","icono":"positivo|neutro|negativo"}],"narrativa":"2-3 oraciones con datos concretos abril 2026","implicacion":"1-2 oraciones para ${cl.name}","giro_indicadores":[{"nombre":"...","valor":"...","icono":"positivo|neutro|negativo"},{"nombre":"...","valor":"...","icono":"positivo|neutro|negativo"}],"giro_narrativa":"1-2 oraciones sobre el giro de ${cl.name}"}`;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const txt=d.content.filter(b=>b.type==="text").map(b=>b.text).join("");
+    const clean=txt.replace(/```json|```/g,"").trim();
+    const s=clean.indexOf("{"),e=clean.lastIndexOf("}");
+    results[current]=JSON.parse(clean.slice(s,e+1));
+  }catch(err){results[current]={error:"No se pudo generar el análisis. Intenta de nuevo."};}
+  btn.disabled=false;btn.textContent="Generar análisis";
+  render(current);
+}
+</script>
+</body>
+</html>
